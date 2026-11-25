@@ -1,11 +1,11 @@
 ---
 name: create-xray
-description: Xray VLESS + REALITY + XTLS Vision 自建节点方案。用于部署或运维一台自建 VPN 节点时，处理 SNI 分流、订阅服务、客户端分流规则、流量统计、自动化运维和排障。
+description: Xray VLESS + REALITY + XTLS Vision 自建中转节点方案。用于部署或运维一台自建转发节点时，处理 SNI 分流、订阅服务、客户端分流规则、流量统计、自动化运维和排障。
 ---
 
-# Xray REALITY 一体化 VPN 节点
+# Xray REALITY 一体化中转节点
 
-> 一套可直接复用的自建翻墙节点方案：**Xray VLESS + REALITY + XTLS Vision**，
+> 一套可直接复用的自建中转节点方案：**Xray VLESS + REALITY + XTLS Vision**，
 > 用 nginx `ssl_preread` 做 SNI 分流，让「节点」和「HTTPS 订阅」共用 443，
 > 附带客户端分流规则、订阅服务、流量统计与自动化运维。
 >
@@ -39,8 +39,8 @@ description: Xray VLESS + REALITY + XTLS Vision 自建节点方案。用于部�
 | 痛点 | 本方案 |
 |------|--------|
 | 传统协议（VMess/SS）易被主动探测和封锁 | **VLESS + REALITY**：借用真实网站的 TLS 握手，无自签证书特征 |
-| WireGuard / OpenVPN 在老内核要 DKMS 编译 | Xray 是**静态二进制**，不碰内核模块，3.10 内核也能跑 |
-| 订阅地址用明文 HTTP + 奇怪端口，容易被墙/被扫 | 订阅和节点**共用 443**，nginx 按 **SNI** 分流，全程 TLS |
+| 内核态隧道方案（WireGuard 等）在老内核要 DKMS 编译 | Xray 是**静态二进制**，不碰内核模块，3.10 内核也能跑 |
+| 订阅地址用明文 HTTP + 奇怪端口，容易被主动探测和扫描 | 订阅和节点**共用 443**，nginx 按 **SNI** 分流，全程 TLS |
 | 伪装目标选错，越用越慢 | 部署时**实测握手耗时**挑 dest，并定时复测 |
 | 订阅服务被扫描器慢连接卡死 | 多线程 + 连接超时 + 看门狗自动重启 |
 | 不知道流量用到哪了 | `vnstat` + 计费周期对齐 + 订阅头显示已用/剩余 |
@@ -311,7 +311,7 @@ Caddy 会自动用 80 端口完成 ACME，签发 Let's Encrypt 证书。
 `/etc/sysctl.d/99-xray-tune.conf`：
 
 ```ini
-# PMTU 黑洞探测：跨境链路「连上但极慢/时断时续」的自愈
+# PMTU 黑洞探测：长距离链路「连上但极慢/时断时续」的自愈
 net.ipv4.tcp_mtu_probing = 1
 
 # TCP 缓冲
@@ -556,7 +556,7 @@ systemctl list-timers | grep sub-watch
 
 ### Q1：为什么入站和出站几乎一样大？我又没上传什么东西
 
-因为 VPN 是**两段传输**。你下载 1GB，服务器是：
+因为转发是**两段传输**。你下载 1GB，服务器是：
 
 ```text
 源站 ──1GB──▶ 服务器 ──1GB──▶ 你的设备
@@ -577,7 +577,7 @@ systemctl list-timers | grep sub-watch
 判断标准：**看服务器网卡的真实计数器**（`vnstat` / `/proc/net/dev`），
 入出应该基本相等。若真出现单向大很多，才需要排查异常。
 
-### Q3：有没有「单向传输」的 VPN？
+### Q3：有没有「单向传输」的中转？
 
 **技术上没有。** 转发必然一进一出，TCP 还要回 ACK，UDP/QUIC 也有回程。
 
