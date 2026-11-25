@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UDI Knowledge Entry",
+  "type": "object",
+  "required": [
+    "id",
+    "kind",
+    "title",
+    "statement",
+    "context",
+    "mechanism",
+    "applications",
+    "limitations",
+    "evidence"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "principle",
+        "heuristic",
+        "decision",
+        "pattern",
+        "critique",
+        "case",
+        "designer_method"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "statement": {
+      "type": "string"
+    },
+    "context": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mechanism": {
+      "type": "string"
+    },
+    "applications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "domain",
+          "example"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "counterexamples": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source",
+          "source_type"
+        ],
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "source_type": {
+            "enum": [
+              "primary",
+              "academic",
+              "institutional",
+              "practitioner",
+              "secondary"
+            ]
+          }
+        }
+      }
+    },
+    "confidence": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "researcher_inference": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
